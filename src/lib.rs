@@ -22,7 +22,7 @@
 //! async fn main() -> kube::Result<()> {
 //!     // Credentials are loaded from the environment (see [`default_gke_client`])
 //!     let gke = default_gke_client().await
-//!         .map_err(kube::Error::Service)?;
+//!         .map_err(|err| kube::Error::Service(Box::new(err)))?;
 //!
 //!     // One call produces a ready-to-use Kubernetes client
 //!     let client = gke
@@ -56,6 +56,7 @@
 //! | [`IntoKubeconfig`] | `gke::model::Cluster` | `kube::config::Kubeconfig` |
 
 use google_cloud_container_v1 as gke;
+use google_cloud_gax as gax;
 use kube_client::config as kubeconfig;
 
 /// Extension trait that adds GKE-aware helpers to
@@ -82,7 +83,7 @@ use kube_client::config as kubeconfig;
 /// # #[tokio::main]
 /// # async fn main() -> kube::Result<()> {
 /// let gke = default_gke_client().await
-///     .map_err(kube::Error::Service)?;
+///     .map_err(|err| kube::Error::Service(Box::new(err)))?;
 /// let client = gke
 ///     .try_gke_kube_client("my-project", "us-central1", "my-cluster")
 ///     .await?;
@@ -178,7 +179,7 @@ pub trait TryGkeClusterExt {
     /// #[tokio::main]
     /// async fn main() -> kube::Result<()> {
     ///     let gke = default_gke_client().await
-    ///         .map_err(kube::Error::Service)?;
+    ///         .map_err(|err| kube::Error::Service(Box::new(err)))?;
     ///     let client = gke
     ///         .try_gke_kube_client("my-project", "us-central1", "my-cluster")
     ///         .await?;
@@ -431,7 +432,7 @@ impl IntoKubeconfig for gke::model::Cluster {
 /// # #[tokio::main]
 /// # async fn main() -> kube::Result<()> {
 /// let gke = default_gke_client().await
-///     .map_err(kube::Error::Service)?;
+///     .map_err(|err| kube::Error::Service(Box::new(err)))?;
 /// let client = gke
 ///     .try_gke_kube_client("my-project", "us-central1", "my-cluster")
 ///     .await?;
@@ -439,9 +440,8 @@ impl IntoKubeconfig for gke::model::Cluster {
 /// # Ok(())
 /// # }
 /// ```
-pub async fn default_gke_client()
--> Result<gke::client::ClusterManager, Box<dyn std::error::Error + Send + Sync>> {
-    Ok(gke::client::ClusterManager::builder().build().await?)
+pub async fn default_gke_client() -> gax::client_builder::Result<gke::client::ClusterManager> {
+    gke::client::ClusterManager::builder().build().await
 }
 
 trait ClusterExt {

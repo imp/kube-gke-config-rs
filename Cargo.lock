@@ -1183,6 +1183,7 @@ version = "3.0.0"
 dependencies = [
  "base64",
  "google-cloud-container-v1",
+ "google-cloud-gax",
  "k8s-openapi",
  "kube",
  "kube-client",

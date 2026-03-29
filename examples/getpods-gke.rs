@@ -28,10 +28,12 @@ async fn main() -> kube::Result<()> {
         return Ok(());
     };
 
-    let gke = default_gke_client().await.map_err(kube::Error::Service)?;
+    let cm = default_gke_client()
+        .await
+        .map_err(|err| kube::Error::Service(Box::new(err)))?;
 
     // Step 1 (optional): inspect the raw cluster metadata from GKE.
-    let info = gke
+    let info = cm
         .try_gke_cluster(&project, &location, &cluster)
         .await
         .map_err(|err| kube::Error::Service(Box::new(err)))?;
@@ -39,13 +41,13 @@ async fn main() -> kube::Result<()> {
     println!("Kubernetes version : {}", info.current_master_version);
 
     // Step 2 (optional): inspect the derived kube config.
-    let config = gke
+    let config = cm
         .try_gke_kube_config(&project, &location, &cluster)
         .await?;
     println!("kube::Config URL   : {}", config.cluster_url);
 
     // Step 3: build the client and list pods.
-    let client = gke
+    let client = cm
         .try_gke_kube_client(&project, &location, &cluster)
         .await?;
     let lp = api::ListParams::default();
