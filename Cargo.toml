@@ -1,6 +1,6 @@
 [package]
 name = "kube-gke-config"
-version = "3.0.0"
+version = "3.0.1"
 edition = "2024"
 description = "Helper for creating kube::Config and kube::Client for GKE clusters"
 license = "Apache-2.0"
