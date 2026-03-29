@@ -1,0 +1,22 @@
+[package]
+name = "kube-gke-config"
+version = "3.0.0"
+edition = "2024"
+description = "Helper for creating kube::Config and kube::Client for GKE clusters"
+license = "Apache-2.0"
+
+[dependencies]
+base64 = "0.22"
+google-cloud-container-v1 = "1.8"
+k8s-openapi = { version = "0.27", features = ["latest"] }
+kube-client = "3.1"
+pem = "3.0"
+
+[dev-dependencies]
+kube = { version = "3.1", features = [
+    "client",
+    "rustls-tls",
+    "aws-lc-rs",
+    # "ring",
+] }
+tokio = { version = "1", features = ["full"] }
